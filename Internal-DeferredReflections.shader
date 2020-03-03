@@ -77,10 +77,16 @@ half4 frag (unity_v2f_deferred i) : SV_Target
 	 
 	        
 			fixed4 col = tex3D(_VolumeGITex, worldPos/10);
-			fixed4 colRefCenter = tex3D(_VolumeGITex, half3(3.2,1.97,5.14)/10);
+			fixed4 colRefCenter = tex3D(_VolumeGITex, half3(3.82,4.38,4.49)/10);
 				if(_VolumeGIUsed>0.5){
-		env0/=0.1+(max(0,worldNormalRefl.z*colRefCenter.r)+max(0,worldNormalRefl.z*colRefCenter.b)+max(0,-worldNormalRefl.x*colRefCenter.g)+max(0,-worldNormalRefl.x*colRefCenter.a)) ;
-				env0*= (max(0,worldNormalRefl.z*col.r)+max(0,worldNormalRefl.z*col.b)+max(0,-worldNormalRefl.x*col.g)+max(0,-worldNormalRefl.x*col.a))/2.8 ;
+			 	//	float 	 evnScale=1/(0.01+sqrt(pow(max(0,worldNormalRefl.z*colRefCenter.r)+max(0,-worldNormalRefl.z*colRefCenter.b),2)+pow(max(0,-worldNormalRefl.x*colRefCenter.g)+max(0,worldNormalRefl.x*colRefCenter.a),2))/1.414 );
+			//  	evnScale*=pow( sqrt(pow(max(0,worldNormalRefl.z*col.r)+max(0,-worldNormalRefl.z*col.b),2)+pow(max(0,-worldNormalRefl.x*col.g)+max(0,worldNormalRefl.x*col.a),2))/1.414,1) ;
+		 //evnScale*=1.5;
+		// if(evnScale>1)evnScale=sqrt(evnScale);
+		 //evnScale/=1.5;
+//	  env0*=evnScale;//lerp(0.1 ,0.4,evnScale);
+	 env0/=0.01+(max(0,worldNormalRefl.z*colRefCenter.r)+max(0,-worldNormalRefl.z*colRefCenter.b)+max(0,-worldNormalRefl.x*colRefCenter.g)+max(0,worldNormalRefl.x*colRefCenter.a)) ;
+			 	env0*= (max(0,worldNormalRefl.z*col.r)+max(0,-worldNormalRefl.z*col.b)+max(0,-worldNormalRefl.x*col.g)+max(0,worldNormalRefl.x*col.a))/1.414 ;
 		 }
 			
 			 

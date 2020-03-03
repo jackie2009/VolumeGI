@@ -27,6 +27,7 @@ public class LightProbeMake : MonoBehaviour
            posIndexs[index] = i;
         }
          volumeGI=new Texture3D(10,10,10,TextureFormat.ARGB32,false);
+         Color[] data=new Color[10*10*10];
         for (int x = 0; x < 10; x++)
         {
             for (int y = 0; y < 10; y++)
@@ -39,12 +40,13 @@ public class LightProbeMake : MonoBehaviour
                  Color [] colors=new Color[4];
                  sh.Evaluate(new Vector3[]{Vector3.forward, Vector3.left, Vector3.back, Vector3.right}, colors);
                  Color clr=new Color(numin(colors[0]),numin(colors[1]),numin(colors[2]),numin(colors[3]));
-                   volumeGI.SetPixel(x,y,z,clr);
+                   
+                   data[z * 100 + y * 10 + x] = clr;
                 }
                 
             }
         }
-        
+        volumeGI.SetPixels(data);
         volumeGI.Apply();
         Shader.SetGlobalTexture("_VolumeGITex",volumeGI);
     }
