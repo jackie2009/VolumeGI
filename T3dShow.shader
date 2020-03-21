@@ -50,7 +50,7 @@
             fixed4 frag (v2f i) : SV_Target
             {
                 // sample the texture
-                fixed4 col = tex3D(_VolumeGITex, float3(i.uv.x,_Z/10,i.uv.y));
+                fixed4 col = tex3D(_VolumeGITex, float3(i.uv.x,i.uv.y,_Z/70));
                 // apply fog
                 UNITY_APPLY_FOG(i.fogCoord, col);
                 return col;

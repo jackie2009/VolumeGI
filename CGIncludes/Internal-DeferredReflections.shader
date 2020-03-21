@@ -27,14 +27,15 @@ CGPROGRAM
 sampler2D _CameraGBufferTexture0;
 sampler2D _CameraGBufferTexture1;
 sampler2D _CameraGBufferTexture2;
-
+// sampler3D _VolumeGITex;
+//	   float _VolumeGIUsed;
+//	   float4 _VolumeGIBoxSize;
 half3 distanceFromAABB(half3 p, half3 aabbMin, half3 aabbMax)
 {
 	return max(max(p - aabbMax, aabbMin - p), half3(0.0, 0.0, 0.0));
 }
-  StructuredBuffer <float4> allLPData;
-	   sampler3D _VolumeGITex;
-	   float _VolumeGIUsed;
+
+
 half4 frag (unity_v2f_deferred i) : SV_Target
 {
 	// Stripped from UnityDeferredCalculateLightParams, refactor into function ?
@@ -74,23 +75,17 @@ half4 frag (unity_v2f_deferred i) : SV_Target
 	Unity_GlossyEnvironmentData g = UnityGlossyEnvironmentSetup(data.smoothness, d.worldViewDir, data.normalWorld, data.specularColor);
 
 	half3 env0 = UnityGI_IndirectSpecular(d, data.occlusion, g);
-	 
-	        
-			fixed4 col = tex3D(_VolumeGITex, worldPos/10);
-			fixed4 colRefCenter = tex3D(_VolumeGITex, half3(3.82,4.38,4.49)/10);
+
 				if(_VolumeGIUsed>0.5){
-			 	//	float 	 evnScale=1/(0.01+sqrt(pow(max(0,worldNormalRefl.z*colRefCenter.r)+max(0,-worldNormalRefl.z*colRefCenter.b),2)+pow(max(0,-worldNormalRefl.x*colRefCenter.g)+max(0,worldNormalRefl.x*colRefCenter.a),2))/1.414 );
-			//  	evnScale*=pow( sqrt(pow(max(0,worldNormalRefl.z*col.r)+max(0,-worldNormalRefl.z*col.b),2)+pow(max(0,-worldNormalRefl.x*col.g)+max(0,worldNormalRefl.x*col.a),2))/1.414,1) ;
-		 //evnScale*=1.5;
-		// if(evnScale>1)evnScale=sqrt(evnScale);
-		 //evnScale/=1.5;
-//	  env0*=evnScale;//lerp(0.1 ,0.4,evnScale);
-	 env0/=0.01+(max(0,worldNormalRefl.z*colRefCenter.r)+max(0,-worldNormalRefl.z*colRefCenter.b)+max(0,-worldNormalRefl.x*colRefCenter.g)+max(0,worldNormalRefl.x*colRefCenter.a)) ;
-			 	env0*= (max(0,worldNormalRefl.z*col.r)+max(0,-worldNormalRefl.z*col.b)+max(0,-worldNormalRefl.x*col.g)+max(0,worldNormalRefl.x*col.a))/1.414 ;
-		 }
-			
+				fixed3 col =Luminance ( getSHColor3D(worldNormalRefl,0, worldPos));
 			 
-//env0*=0.1;
+			fixed3 colRefCenter = Luminance( getSHColor3D( worldNormalRefl,0,   unity_SpecCube0_ProbePosition));
+ 
+	 
+	 env0*=col/max(0.01,colRefCenter);
+	  
+	 
+		 }
 	UnityLight light;
 	light.color = half3(0, 0, 0);
 	light.dir = half3(0, 1, 0);
